@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DELTARUNE</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: white;
+            color: black;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .message {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .message:hover {
+            background: #f8f8f8;
+        }
+        
+        .message.selected {
+            background: #f0f0f0;
+            border-left: 3px solid #0066cc;
+            padding-left: 10px;
+        }
+        
+        .message-header {
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .chapter-number {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .chapter-name {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .preview {
+            image-rendering: pixelated;
+            width: 32px;
+            height: 32px;
+            border: 1px solid #ddd;
+        }
+        
+        .controls {
+            margin-top: 30px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .loading.active {
+            display: flex;
+        }
+        
+        .loading-text {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .loading-dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+        
+        .dot {
+            width: 4px;
+            height: 4px;
+            background: #666;
+            border-radius: 50%;
+            animation: dotPulse 1.5s infinite;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes dotPulse {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.3;
+            }
+            30% {
+                transform: translateY(-5px);
+                opacity: 1;
+            }
+        }
+        
+        .progress-container {
+            width: 200px;
+            height: 2px;
+            background: #eee;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #0066cc;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="message selected" data-chapter="1">
+            <div class="message-header">
+                <img src="icons/1.png" class="preview" onerror="this.style.display='none'">
+                <span class="chapter-number">Chapter 1</span>
+                <span class="chapter-name">The Beginning</span>
+            </div>
+        </div>
+        
+        <div class="message" data-chapter="2">
+            <div class="message-header">
+                <img src="icons/2.png" class="preview" onerror="this.style.display='none'">
+                <span class="chapter-number">Chapter 2</span>
+                <span class="chapter-name">A Cyber's World</span>
+            </div>
+        </div>
+        
+        <div class="message" data-chapter="3">
+            <div class="message-header">
+                <img src="icons/3.png" class="preview" onerror="this.style.display='none'">
+                <span class="chapter-number">Chapter 3</span>
+                <span class="chapter-name">Late Night</span>
+            </div>
+        </div>
+        
+        <div class="message" data-chapter="4">
+            <div class="message-header">
+                <img src="icons/4.png" class="preview" onerror="this.style.display='none'">
+                <span class="chapter-number">Chapter 4</span>
+                <span class="chapter-name">Prophecy</span>
+            </div>
+        </div>
+        
+        <div class="controls">
+            Use arrow keys or WASD to navigate • Press Enter to select • Click to choose
+        </div>
+    </div>
+    
+    <div class="loading" id="loading">
+        <div class="loading-text">
+            Loading chapter
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <script>
+        let selectedChapter = 1;
+        let gamestarted = false;
+        
+        const moveSound = new Audio('audios/snd_menumove.mp3');
+        const selectSound = new Audio('audios/snd_select.mp3');
+        
+        function selectChapter(chapter) {
+            if (gamestarted) return;
+            
+            selectedChapter = chapter;
+            
+            document.querySelectorAll('.message').forEach(msg => {
+                msg.classList.remove('selected');
+            });
+            
+            const msg = document.querySelector(`.message[data-chapter="${chapter}"]`);
+            if (msg) {
+                msg.classList.add('selected');
+                moveSound.currentTime = 0;
+                moveSound.play().catch(() => {});
+            }
+        }
+        
+        function loadChapter(chapter) {
+            if (gamestarted) return;
+            
+            selectSound.currentTime = 0;
+            selectSound.play();
+            
+            const loading = document.getElementById('loading');
+            const progressBar = document.getElementById('progressBar');
+            loading.classList.add('active');
+            
+            // Reset progress bar
+            progressBar.style.width = '0%';
+            
+            // Simulate loading progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        fetchChapter(chapter);
+                    }, 300);
+                }
+            }, 150);
+        }
+        
+        function fetchChapter(chapter) {
+            fetch(`https://cdn.jsdelivr.net/gh/1e295a49108e716ce8ab7eba0c8dca7d/9326265e4f1b14345a3bdab6f8ffad0e2e7ab3fda920c5f0f095f77359af00aeae22591c5bc4914c84c13d99eb62091d7ce7/drweb/chapter${chapter}/index.html`)
+                .then(res => res.text())
+                .then(html => {
+                    gamestarted = true;
+                    document.documentElement.innerHTML = html;
+                    document.querySelectorAll('script').forEach(old => {
+                        const newScript = document.createElement('script');
+                        if (old.src) newScript.src = old.src;
+                        else newScript.textContent = old.textContent;
+                        document.body.appendChild(newScript);
+                    });
+                })
+                .catch(() => {
+                    const loading = document.getElementById('loading');
+                    loading.classList.remove('active');
+                    gamestarted = false;
+                    alert(`Error loading Chapter ${chapter}`);
+                });
+        }
+        
+        document.querySelectorAll('.message').forEach(msg => {
+            msg.addEventListener('click', () => {
+                loadChapter(msg.dataset.chapter);
+            });
+            
+            msg.addEventListener('mouseenter', () => {
+                selectChapter(msg.dataset.chapter);
+            });
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (gamestarted) return;
+            
+            const key = e.key.toUpperCase();
+            
+            if (key === 'ARROWUP' || key === 'W') {
+                e.preventDefault();
+                if (selectedChapter > 1) selectChapter(selectedChapter - 1);
+            } else if (key === 'ARROWDOWN' || key === 'S') {
+                e.preventDefault();
+                if (selectedChapter < 4) selectChapter(selectedChapter + 1);
+            } else if (key === 'ENTER' || key === ' ') {
+                e.preventDefault();
+                loadChapter(selectedChapter);
+            } else if (key >= '1' && key <= '4') {
+                e.preventDefault();
+                selectChapter(parseInt(key));
+            }
+        });
+    </script>
+</body>
+</html>
