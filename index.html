@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <base href="https://cdn.jsdelivr.net/gh/technonyte00/deltarune@main/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap"
+        rel="stylesheet">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Deltarune</title>
@@ -9,33 +15,33 @@
         body {
             margin: 0;
             padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+             font-family: "Google Sans", sans-serif;
             background: white;
             color: black;
             line-height: 1.5;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
         }
-        
+
         .message {
             padding: 15px 0;
             border-bottom: 1px solid #eee;
             cursor: pointer;
         }
-        
+
         .message:hover {
             background: #f8f8f8;
         }
-        
+
         .message.selected {
             background: #f0f0f0;
             border-left: 3px solid #0066cc;
             padding-left: 10px;
         }
-        
+
         .message-header {
             font-weight: 500;
             margin-bottom: 5px;
@@ -43,24 +49,24 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .chapter-number {
             font-size: 16px;
             color: #333;
         }
-        
+
         .chapter-name {
             font-size: 14px;
             color: #666;
         }
-        
+
         .preview {
             image-rendering: pixelated;
             width: 32px;
             height: 32px;
             border: 1px solid #ddd;
         }
-        
+
         .controls {
             margin-top: 30px;
             padding: 15px;
@@ -69,7 +75,7 @@
             font-size: 14px;
             color: #666;
         }
-        
+
         .loading {
             display: none;
             position: fixed;
@@ -83,23 +89,23 @@
             flex-direction: column;
             gap: 20px;
         }
-        
+
         .loading.active {
             display: flex;
         }
-        
+
         .loading-text {
             font-size: 16px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        
+
         .loading-dots {
             display: inline-flex;
             gap: 4px;
         }
-        
+
         .dot {
             width: 4px;
             height: 4px;
@@ -107,33 +113,37 @@
             border-radius: 50%;
             animation: dotPulse 1.5s infinite;
         }
-        
+
         .dot:nth-child(2) {
             animation-delay: 0.2s;
         }
-        
+
         .dot:nth-child(3) {
             animation-delay: 0.4s;
         }
-        
+
         @keyframes dotPulse {
-            0%, 60%, 100% {
+
+            0%,
+            60%,
+            100% {
                 transform: translateY(0);
                 opacity: 0.3;
             }
+
             30% {
                 transform: translateY(-5px);
                 opacity: 1;
             }
         }
-        
+
         .progress-container {
             width: 200px;
             height: 2px;
             background: #eee;
             margin-top: 10px;
         }
-        
+
         .progress-bar {
             height: 100%;
             background: #0066cc;
@@ -142,6 +152,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="message selected" data-chapter="1">
@@ -151,7 +162,7 @@
                 <span class="chapter-name">The Beginning</span>
             </div>
         </div>
-        
+
         <div class="message" data-chapter="2">
             <div class="message-header">
                 <img src="icons/2.png" class="preview" onerror="this.style.display='none'">
@@ -159,7 +170,7 @@
                 <span class="chapter-name">A Cyber's World</span>
             </div>
         </div>
-        
+
         <div class="message" data-chapter="3">
             <div class="message-header">
                 <img src="icons/3.png" class="preview" onerror="this.style.display='none'">
@@ -167,7 +178,7 @@
                 <span class="chapter-name">Late Night</span>
             </div>
         </div>
-        
+
         <div class="message" data-chapter="4">
             <div class="message-header">
                 <img src="icons/4.png" class="preview" onerror="this.style.display='none'">
@@ -177,10 +188,11 @@
         </div>
         
         <div class="controls">
+            <small>
             Use arrow keys or WASD to navigate • Press Enter to select • Click to choose
-        </div>
+            </small></div>
     </div>
-    
+
     <div class="loading" id="loading">
         <div class="loading-text">
             Loading chapter
@@ -300,4 +312,5 @@
         });
     </script>
 </body>
+
 </html>
